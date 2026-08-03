@@ -17,9 +17,11 @@
  */
 
 #include <stdint.h>
+#include "stm32l476xx.h"
 
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+    for (;;) {
+        __NOP();
+    }
 }
