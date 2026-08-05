@@ -32,6 +32,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/files.cmake)
 target_sources(${PROJECT_NAME} PRIVATE
   # User defined sources
   Src/system.c
+  Src/gpio.c
 )
 
 # Add include directories
@@ -39,6 +40,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   # User defined include directories
   Drivers/CMSIS/Include
   Drivers/CMSIS/Device/ST/STM32L4xx/Include
+  l476_baremetal/Inc/gpio.h
 
 )
 

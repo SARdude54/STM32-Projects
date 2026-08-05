@@ -18,69 +18,30 @@
 
 #include <stdint.h>
 #include "stm32l476xx.h"
+#include "gpio.h"
 
 #define LED_PIN 5u
 
-static void led_gpio_init(void);
 static void delay_approximate(volatile uint32_t count);
 
 int main(void){
-    led_gpio_init();
+    gpio_pin_init(
+        GPIOA,
+        LED_PIN,
+        GPIO_MODE_OUTPUT,
+        GPIO_OUTPUT_PUSH_PULL,
+        GPIO_SPEED_LOW,
+        GPIO_PULL_NONE);
 
     while(1){
         // drive PA5 HIGH
-        GPIOA->BSRR = (1u << LED_PIN);
+        gpio_pin_write(GPIOA, LED_PIN, 1u);
         delay_approximate(500000u);
 
         // Drive PA5 Low
-        GPIOA->BSRR = (1u << (LED_PIN + 16u));
+        gpio_pin_write(GPIOA, LED_PIN, 0u);
         delay_approximate(500000u);
     }
-}
-
-static void led_gpio_init(void){
-    // GPIOA is connectewd to the AHB2 peripheral bus
-    // Enable its peripheral clock beffore accessing its registers
-    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-
-    // Force completion of the clock-enable write before accessing GPIOA
-    // The value itself is deliberately discarded
-    (void)RCC->AHB2ENR;
-
-    /*
-    GPIO mode register: two bits per pin
-    00 = input
-    01 = general-purpose output
-    10 = alternative-function mode
-    11 = analog mode
-    
-    PA5 occupies MODER bits [11:10]
-    */
-
-    GPIOA->MODER &= ~(3u << (LED_PIN * 2u));
-    GPIOA->MODER |= (1u << (LED_PIN * 2u));
-
-    /*
-    Output type:
-    0 = push-pull
-    1 = open-drain
-    */
-    GPIOA->OTYPER &= ~(1u << LED_PIN);
-
-    /*
-    Output speed:
-    00 = low speed
-
-    Low speed for user LED
-    */  
-    GPIOA->OSPEEDR &= ~(3u << (LED_PIN * 2u));
-
-   /*
-   Pull configuration
-   00 = no pull-up or pull-down
-   */
-    GPIOA->PUPDR &= ~(3u << (LED_PIN * 2u));
-
 }
 
 static void delay_approximate(volatile uint32_t count){
