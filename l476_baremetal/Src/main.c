@@ -16,37 +16,32 @@
  ******************************************************************************
  */
 
+
 #include <stdint.h>
 #include "stm32l476xx.h"
-#include "gpio.h"
-
-#define LED_PIN 5u
+#include "bsp_led.h"
 
 static void delay_approximate(volatile uint32_t count);
 
-int main(void){
-    gpio_pin_init(
-        GPIOA,
-        LED_PIN,
-        GPIO_MODE_OUTPUT,
-        GPIO_OUTPUT_PUSH_PULL,
-        GPIO_SPEED_LOW,
-        GPIO_PULL_NONE);
+int main(void)
+{
+    bsp_led_init();
 
-    while(1){
-        // drive PA5 HIGH
-        gpio_pin_write(GPIOA, LED_PIN, 1u);
-        delay_approximate(500000u);
-
-        // Drive PA5 Low
-        gpio_pin_write(GPIOA, LED_PIN, 0u);
+    while (1)
+    {
+        bsp_led_toggle();
         delay_approximate(500000u);
     }
 }
 
-static void delay_approximate(volatile uint32_t count){
-    while (count > 0u){
+static void delay_approximate(volatile uint32_t count)
+{
+    while (count > 0u)
+    {
         __NOP();
         count--;
     }
 }
+
+
+
