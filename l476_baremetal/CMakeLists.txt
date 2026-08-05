@@ -34,6 +34,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   Src/system.c
   Src/gpio.c
   Src/bsp_led.c
+  Src/timebase.c
 )
 
 # Add include directories
@@ -43,6 +44,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   Drivers/CMSIS/Device/ST/STM32L4xx/Include
   l476_baremetal/Inc/gpio.h
   l476_baremetal/Inc/bsp_led.h
+  l476_baremetal/Inc/timebase.h
 
 )
 

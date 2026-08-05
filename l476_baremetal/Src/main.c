@@ -20,28 +20,23 @@
 #include <stdint.h>
 #include "stm32l476xx.h"
 #include "bsp_led.h"
+#include "timebase.h"
 
-static void delay_approximate(volatile uint32_t count);
+#define RESET_CLOCK_HZ 4000000u
 
 int main(void)
 {
+    timebase_init(RESET_CLOCK_HZ);
     bsp_led_init();
 
     while (1)
     {
         bsp_led_toggle();
-        delay_approximate(500000u);
+        delay_ms(500u);
     }
 }
 
-static void delay_approximate(volatile uint32_t count)
-{
-    while (count > 0u)
-    {
-        __NOP();
-        count--;
-    }
-}
+
 
 
 
