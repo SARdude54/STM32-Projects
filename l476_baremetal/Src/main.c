@@ -22,17 +22,25 @@
 #include "bsp_led.h"
 #include "timebase.h"
 
-#define RESET_CLOCK_HZ 4000000u
+#define SYSTEM_CLOCK_HZ 4000000u
+#define LED_TOGGLE_PERIOD_MS 500u
 
 int main(void)
 {
-    timebase_init(RESET_CLOCK_HZ);
+
+    uint32_t last_toggle_ms = 0u;
+
+    timebase_init(SYSTEM_CLOCK_HZ);
     bsp_led_init();
 
-    while (1)
-    {
-        bsp_led_toggle();
-        delay_ms(500u);
+    while (1){
+
+        const uint32_t now_ms = timebase_get_ms();
+
+        if((uint32_t)(now_ms - last_toggle_ms) >= LED_TOGGLE_PERIOD_MS){
+            last_toggle_ms += LED_TOGGLE_PERIOD_MS;
+            bsp_led_toggle();
+        }
     }
 }
 
