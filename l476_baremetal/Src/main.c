@@ -17,9 +17,7 @@
  */
 
 
-#include <stdint.h>
-#include "stm32l476xx.h"
-#include "bsp_led.h"
+#include "app.h"
 #include "timebase.h"
 
 #define SYSTEM_CLOCK_HZ 4000000u
@@ -31,7 +29,7 @@ int main(void)
     uint32_t last_toggle_ms = 0u;
 
     timebase_init(SYSTEM_CLOCK_HZ);
-    bsp_led_init();
+    app_init();
 
     while (1){
 
@@ -39,7 +37,7 @@ int main(void)
 
         if((uint32_t)(now_ms - last_toggle_ms) >= LED_TOGGLE_PERIOD_MS){
             last_toggle_ms += LED_TOGGLE_PERIOD_MS;
-            bsp_led_toggle();
+            app_update();
         }
     }
 }

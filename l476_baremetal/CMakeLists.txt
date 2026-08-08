@@ -35,6 +35,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   Src/gpio.c
   Src/bsp_led.c
   Src/timebase.c
+  Src/app.c
 )
 
 # Add include directories
@@ -45,6 +46,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   l476_baremetal/Inc/gpio.h
   l476_baremetal/Inc/bsp_led.h
   l476_baremetal/Inc/timebase.h
+  l476_baremetal/Inc/app.h
 
 )
 
