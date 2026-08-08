@@ -4,9 +4,13 @@
 #include "bsp_led.h"
 #include "timebase.h"
 
-#define LED_TOGGLE_PERIOD_MS 500u
 #define LED_ON_PERIOD_MS 100u
 #define LED_OFF_PERIOD_MS 900u
+
+typedef enum {
+    LED_STATE_ON,
+    LED_STATE_OFF
+} led_state_t;
 
 static uint32_t last_toggle_ms;
 static led_state_t state;
@@ -15,8 +19,10 @@ void app_init(){
     last_toggle_ms = timebase_get_ms();
     bsp_led_init();
 
-    led_state_t state;
     state = LED_STATE_OFF;
+
+    bsp_led_init();
+    bsp_led_off();
 }
 
 void app_update(){
@@ -41,7 +47,13 @@ void app_update(){
             }
             break;
         }
-    }
+
+        default:
+            state = LED_STATE_OFF;
+            last_toggle_ms = now_ms;
+            bsp_led_off();
+            break;
+        }
 }
 
 
