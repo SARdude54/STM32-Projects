@@ -87,15 +87,16 @@ void gpio_pin_init(GPIO_TypeDef *port, uint32_t pin, gpio_mode_t mode, gpio_outp
     PA5 occupies MODER bits [11:10]
     */
 
-    GPIOA->MODER &= ~(3u << shift); // fuield mask
-    GPIOA->MODER |= (1u << shift); // new_value
+    port->MODER &= ~(3u << shift); // fuield mask
+    port->MODER |= ((uint32_t)mode << shift); // new_value
 
     /*
     Output type:
     0 = push-pull
     1 = open-drain
     */
-    GPIOA->OTYPER &= ~(1u << pin);
+    port->OTYPER &= ~(1u << pin);
+    port->OTYPER |= ((uint32_t)output_type << pin);
 
     /*
     Output speed:
@@ -103,12 +104,14 @@ void gpio_pin_init(GPIO_TypeDef *port, uint32_t pin, gpio_mode_t mode, gpio_outp
 
     Low speed for user LED
     */  
-    GPIOA->OSPEEDR &= ~(3u << shift);
+    port->OSPEEDR &= ~(3u << shift);
+    port->OSPEEDR |= ((uint32_t)speed << shift);
 
    /*
    Pull configuration
    00 = no pull-up or pull-down
    */
-    GPIOA->PUPDR &= ~(3u << shift);
+    port->PUPDR &= ~(3u << shift);
+    port->PUPDR |= ((uint32_t)pull << shift);
 
 }
