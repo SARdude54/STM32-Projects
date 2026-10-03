@@ -12,14 +12,4 @@ void app_init(void)
 
 void app_update(void)
 {
-    const uint32_t button_state = bsp_button_read();
-
-    if (button_state != 0u)
-    {
-        bsp_led_on();
-    }
-    else
-    {
-        bsp_led_off();
-    }
 }
