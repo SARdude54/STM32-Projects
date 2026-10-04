@@ -11,6 +11,9 @@ void app_init(void)
 }
 
 void app_update(void){
+
+    bsp_button_update();
+
     if(bsp_button_pressed() != 0u){
         bsp_led_toggle();
     }
