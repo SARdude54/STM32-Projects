@@ -10,6 +10,8 @@ void app_init(void)
     bsp_button_init();
 }
 
-void app_update(void)
-{
+void app_update(void){
+    if(bsp_button_pressed() != 0u){
+        bsp_led_toggle();
+    }
 }

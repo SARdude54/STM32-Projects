@@ -1,9 +1,10 @@
 #include "bsp_button.h"
-#include "bsp_led.h"
 #include "gpio.h"
 
 #define BUTTON_PORT GPIOC
 #define BUTTON_PIN 13u
+
+static volatile uint32_t button_pressed_event;
 
 static void bsp_button_exti_init(void){
     // enable syscfg clock
@@ -14,16 +15,16 @@ static void bsp_button_exti_init(void){
     SYSCFG->EXTICR[3] |= (0x2u << 4u);
 
     // unmask EXTI13
-    EXTI->IMR1 |= (1u << 13);
+    EXTI->IMR1 |= (1u << BUTTON_PIN);
     
     // disable rising edge for this line
-    EXTI->RTSR1 &= ~(1u << 13);
+    EXTI->RTSR1 &= ~(1u << BUTTON_PIN);
 
     // enable falling edge
-    EXTI->FTSR1 |= (1u << 13);
+    EXTI->FTSR1 |= (1u << BUTTON_PIN);
     
     // clear any state pending interrupt
-    EXTI->PR1 = (1u << 13);
+    EXTI->PR1 = (1u << BUTTON_PIN);
 
     // enable the grouped NVIC interrupt
     NVIC_ClearPendingIRQ(EXTI15_10_IRQn);
@@ -33,10 +34,10 @@ static void bsp_button_exti_init(void){
 }
 
 void EXTI15_10_IRQHandler(void){
-    if((EXTI->PR1 & (1u << 13)) != 0u){
-        EXTI->PR1 = (1u<< 13);
+    if((EXTI->PR1 & (1u << BUTTON_PIN)) != 0u){
+        EXTI->PR1 = (1u << BUTTON_PIN);
 
-        bsp_led_toggle();
+        button_pressed_event = 1u;
     }
 }
 
@@ -49,9 +50,18 @@ void bsp_button_init(void){
         GPIO_SPEED_LOW,
         GPIO_PULL_NONE);
 
+    button_pressed_event = 0u;
     bsp_button_exti_init();
 }
 
 uint32_t bsp_button_read(void){
     return gpio_pin_read(BUTTON_PORT, BUTTON_PIN);
+}
+
+uint32_t bsp_button_pressed(void){
+    if(button_pressed_event != 0u){
+        button_pressed_event = 0u;
+        return 1u;
+    }
+    return 0u;
 }

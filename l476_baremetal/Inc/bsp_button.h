@@ -5,5 +5,6 @@
 
 void bsp_button_init(void);
 uint32_t bsp_button_read(void);
+uint32_t bsp_button_pressed(void);
 
 #endif
