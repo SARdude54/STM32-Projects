@@ -1,4 +1,3 @@
-#include "stm32l476xx.h"
 #include "gpio.h"
 
 static void gpio_enable_clock(GPIO_TypeDef *port)
@@ -113,5 +112,14 @@ void gpio_pin_init(GPIO_TypeDef *port, uint32_t pin, gpio_mode_t mode, gpio_outp
    */
     port->PUPDR &= ~(3u << shift);
     port->PUPDR |= ((uint32_t)pull << shift);
+
+}
+
+void gpio_pin_set_alternate_function(GPIO_TypeDef *port, uint32_t pin, uint32_t alternate_function){
+    const uint32_t afr_index = pin / 8u;
+    const uint32_t afr_shift = (pin % 8u) * 4u;
+
+    port->AFR[afr_index] &= ~(0xFu << afr_shift);
+    port->AFR[afr_index] |= ((alternate_function & 0xFu) << afr_shift);
 
 }

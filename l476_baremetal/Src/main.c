@@ -19,6 +19,7 @@
 
 #include "app.h"
 #include "timebase.h"
+#include "stm32l476xx.h"
 
 #define SYSTEM_CLOCK_HZ 4000000u
 #define LED_TOGGLE_PERIOD_MS 500u
@@ -30,6 +31,9 @@ int main(void)
 
     timebase_init(SYSTEM_CLOCK_HZ);
     app_init();
+
+    volatile uint32_t ccipr = RCC->CCIPR;
+    volatile uint32_t cfgr  = RCC->CFGR;
 
     while (1){
 

@@ -34,5 +34,6 @@ void gpio_pin_init(GPIO_TypeDef *port, uint32_t pin, gpio_mode_t mode, gpio_outp
 void gpio_pin_write(GPIO_TypeDef *port, uint32_t pin, uint32_t state);
 uint32_t gpio_pin_read(GPIO_TypeDef *port, uint32_t pin);
 void gpio_pin_toggle(GPIO_TypeDef *port, uint32_t pin);
+void gpio_pin_set_alternate_function(GPIO_TypeDef *port, uint32_t pin, uint32_t alternate_function);
 
 #endif
