@@ -20,9 +20,13 @@ void app_init(void)
 
 void app_update(void){
 
-    bsp_button_update();
+    uint8_t byte;
 
-    if(bsp_button_pressed() != 0u){
-        bsp_led_toggle();
-    }
+    byte = uart2_read_byte();
+
+    uart2_write_byte('[');
+    uart2_write_byte(byte);
+    uart2_write_byte(']');
+
+
 }

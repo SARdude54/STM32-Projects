@@ -24,29 +24,15 @@
 #define SYSTEM_CLOCK_HZ 4000000u
 #define LED_TOGGLE_PERIOD_MS 500u
 
-int main(void)
-{
-
-    uint32_t last_toggle_ms = 0u;
+int main(void){
 
     timebase_init(SYSTEM_CLOCK_HZ);
     app_init();
 
-    volatile uint32_t ccipr = RCC->CCIPR;
-    volatile uint32_t cfgr  = RCC->CFGR;
-
     while (1){
-
-        const uint32_t now_ms = timebase_get_ms();
-
-        if((uint32_t)(now_ms - last_toggle_ms) >= LED_TOGGLE_PERIOD_MS){
-            last_toggle_ms += LED_TOGGLE_PERIOD_MS;
-            app_update();
-        }
+        app_update();
     }
 }
-
-
 
 
 
