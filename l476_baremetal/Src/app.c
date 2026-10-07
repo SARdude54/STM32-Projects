@@ -8,8 +8,8 @@
 #define USART2_CLOCK_HZ 4000000u
 #define UART_BAUD_RATE  115200u
 
-void app_init(void)
-{
+void app_init(void){
+    
     bsp_led_init();
     bsp_button_init();
 
@@ -22,11 +22,10 @@ void app_update(void){
 
     uint8_t byte;
 
-    byte = uart2_read_byte();
-
-    uart2_write_byte('[');
-    uart2_write_byte(byte);
-    uart2_write_byte(']');
-
-
+    if (uart2_read_byte_nonblocking(&byte) != 0u)
+    {
+        uart2_write_byte('[');
+        uart2_write_byte(byte);
+        uart2_write_byte(']');
+    }
 }

@@ -8,5 +8,6 @@ void uart2_write_byte(uint8_t byte);
 void uart2_write_string(const char *string);
 
 uint8_t uart2_read_byte(void);
+uint32_t uart2_read_byte_nonblocking(uint8_t *byte);
 
 #endif

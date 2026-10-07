@@ -10,6 +10,9 @@
 
 #define UART2_AF      7u
 
+static volatile uint8_t uart2_rx_byte;
+static volatile uint32_t  uart2_rx_event;
+
 void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     
     /* PA2 = USART2_TX */
@@ -44,6 +47,10 @@ void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN;
     (void)RCC->APB1ENR1;
 
+    /* init software receieve state before interrupts are enabled*/
+    uart2_rx_byte = 0u;
+    uart2_rx_event = 0u;
+
     /* Disable USART while configuring */
     USART2->CR1 &= ~USART_CR1_UE;
 
@@ -57,8 +64,7 @@ void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     USART2->CR2 &= ~USART_CR2_STOP;
 
     /* Baud rate */
-    USART2->BRR =
-        (peripheral_clock_hz + (baud_rate / 2u)) / baud_rate;
+    USART2->BRR = (peripheral_clock_hz + (baud_rate / 2u)) / baud_rate;
 
     /* Enable USART */
     USART2->CR1 |= USART_CR1_UE;
@@ -66,6 +72,15 @@ void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     /* Enable transmitter and receiver */
     USART2->CR1 |= USART_CR1_TE;
     USART2->CR1 |= USART_CR1_RE;
+
+    // enable the recieve data interrupt
+    USART2->CR1 |= USART_CR1_RXNEIE; // tells USART to generate an interrupt request when RXNE becomes set.
+
+    // USART2 RXNEIE -> USART2 interrupt request -> NVIC USART_IRQn enabled -> CPU executes USART2_IRQHandler()
+    NVIC_ClearPendingIRQ(USART2_IRQn);
+    NVIC_SetPriority(USART2_IRQn, 5u);
+    NVIC_EnableIRQ(USART2_IRQn);
+
 }
 
 
@@ -92,4 +107,39 @@ uint8_t uart2_read_byte(void)
     }
 
     return (uint8_t)USART2->RDR;
+}
+
+uint32_t uart2_read_byte_nonblocking(uint8_t *byte){
+    /**
+     * @brief 
+     * return 1 if byte was avbailable written into *byte
+     * return 0 if nothing available
+     * 
+     */
+
+    if(uart2_rx_event != 0u){
+        uart2_rx_event = 0u;
+        *byte = uart2_rx_byte;
+        return 1u;
+    }
+
+    return 0u;
+
+}
+
+void USART2_IRQHandler(void){
+    /**
+     * @brief 
+     * 
+     * Check RXNE
+     * readd byte
+     * sore byte
+     * set event
+     * return
+     * 
+     */
+    if((USART2->ISR & USART_ISR_RXNE) != 0u){
+        uart2_rx_byte = (uint8_t)USART2->RDR;
+        uart2_rx_event = 1u;
+    }
 }

@@ -29,7 +29,8 @@ int main(void){
     timebase_init(SYSTEM_CLOCK_HZ);
     app_init();
 
-    while (1){
+    while (1)
+    {
         app_update();
     }
 }
