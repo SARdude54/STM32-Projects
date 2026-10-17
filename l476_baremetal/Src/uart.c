@@ -10,8 +10,12 @@
 
 #define UART2_AF      7u
 
-static volatile uint8_t uart2_rx_byte;
-static volatile uint32_t  uart2_rx_event;
+#define UART2_RX_BUFFER_SIZE 16u
+
+static volatile uint8_t uart2_rx_buffer[UART2_RX_BUFFER_SIZE];
+static volatile uint32_t uart2_rx_head;
+static volatile uint32_t uart2_rx_tail;
+static volatile uint32_t uart2_rx_overflow_count;
 
 void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     
@@ -48,8 +52,9 @@ void uart2_init(uint32_t peripheral_clock_hz, uint32_t baud_rate){
     (void)RCC->APB1ENR1;
 
     /* init software receieve state before interrupts are enabled*/
-    uart2_rx_byte = 0u;
-    uart2_rx_event = 0u;
+    uart2_rx_head = 0u;
+    uart2_rx_tail = 0u;
+    uart2_rx_overflow_count = 0u;
 
     /* Disable USART while configuring */
     USART2->CR1 &= ~USART_CR1_UE;
@@ -100,46 +105,38 @@ void uart2_write_string(const char *string){
     }
 }
 
-uint8_t uart2_read_byte(void)
+uint32_t uart2_read_byte(uint8_t *byte)
 {
-    while ((USART2->ISR & USART_ISR_RXNE) == 0u)
+    if (uart2_rx_head == uart2_rx_tail)
     {
+        return 0u;
     }
 
-    return (uint8_t)USART2->RDR;
+    *byte = uart2_rx_buffer[uart2_rx_tail];
+
+    uart2_rx_tail =
+        (uart2_rx_tail + 1u) % UART2_RX_BUFFER_SIZE;
+
+    return 1u;
 }
 
-uint32_t uart2_read_byte_nonblocking(uint8_t *byte){
-    /**
-     * @brief 
-     * return 1 if byte was avbailable written into *byte
-     * return 0 if nothing available
-     * 
-     */
+void USART2_IRQHandler(void)
+{
+    if ((USART2->ISR & USART_ISR_RXNE) != 0u)
+    {
+        const uint8_t byte = (uint8_t)USART2->RDR;
 
-    if(uart2_rx_event != 0u){
-        uart2_rx_event = 0u;
-        *byte = uart2_rx_byte;
-        return 1u;
-    }
+        const uint32_t next_head =
+            (uart2_rx_head + 1u) % UART2_RX_BUFFER_SIZE;
 
-    return 0u;
-
-}
-
-void USART2_IRQHandler(void){
-    /**
-     * @brief 
-     * 
-     * Check RXNE
-     * readd byte
-     * sore byte
-     * set event
-     * return
-     * 
-     */
-    if((USART2->ISR & USART_ISR_RXNE) != 0u){
-        uart2_rx_byte = (uint8_t)USART2->RDR;
-        uart2_rx_event = 1u;
+        if (next_head != uart2_rx_tail)
+        {
+            uart2_rx_buffer[uart2_rx_head] = byte;
+            uart2_rx_head = next_head;
+        }
+        else
+        {
+            uart2_rx_overflow_count++;
+        }
     }
 }

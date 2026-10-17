@@ -9,7 +9,7 @@
 #define UART_BAUD_RATE  115200u
 
 void app_init(void){
-    
+
     bsp_led_init();
     bsp_button_init();
 
@@ -18,11 +18,11 @@ void app_init(void){
     uart2_write_string("Hello from STM32!\r\n");
 }
 
-void app_update(void){
-
+void app_update(void)
+{
     uint8_t byte;
 
-    if (uart2_read_byte_nonblocking(&byte) != 0u)
+    if (uart2_read_byte(&byte) != 0u)
     {
         uart2_write_byte('[');
         uart2_write_byte(byte);
