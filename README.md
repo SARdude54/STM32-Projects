@@ -44,6 +44,12 @@ Confirm the ELF exists:
 ls -lh build/Debug/l476_baremetal.elf
 ```
 
+Flash to the board:
+
+```bash
+openocd     -f interface/stlink.cfg     -f target/stm32l4x.cfg     -c "reset_config srst_only srst_nogate connect_assert_srst"     -c "program build/Debug/l476_baremetal.elf verify reset exit
+```
+
 ## 3. Start OpenOCD
 
 In terminal 1:
