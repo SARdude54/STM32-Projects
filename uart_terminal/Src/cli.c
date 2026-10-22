@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include <string.h>
-#include "cli.h"
 #include "uart.h"
+#include <bsp_led.h>
+#include "cli.h"
+
 
 #define CLI_BUFFER_SIZE 32u
 
@@ -11,6 +13,32 @@ static uint32_t cli_index;
 static void cli_reset_buffer(void){
     cli_index = 0u;
     cli_buffer[0] = '\0';
+}
+
+static void cli_process_command(const char *command){
+    if(strcmp(command, "help") == 0){
+        uart2_write_string("Available commands:\r\n");
+        uart2_write_string("  help\r\n");
+        uart2_write_string("  led on\r\n");
+        uart2_write_string("  led off\r\n");
+        uart2_write_string("  led toggle\r\n");
+
+        
+    } else if(strcmp(command, "led on") == 0){
+        bsp_led_on();
+        uart2_write_string("LED turned ON\r\n");
+
+    } else if(strcmp(command, "led off") == 0){
+        bsp_led_off();
+        uart2_write_string("LED turned OFF\r\n");
+
+    } else if(strcmp(command, "led toggle") == 0){
+        bsp_led_toggle();
+        uart2_write_string("LED toggled\r\n");
+
+    } else {
+        uart2_write_string("Unknown command \r\n");
+    }
 }
 
 
@@ -35,9 +63,9 @@ void cli_update(void){
 
         cli_buffer[cli_index] = '\0';
 
-        uart2_write_string("\r\nCommand received: ");
-        uart2_write_string(cli_buffer);
         uart2_write_string("\r\n");
+
+        cli_process_command(cli_buffer);
 
         cli_reset_buffer();
         
@@ -45,7 +73,7 @@ void cli_update(void){
 
 
     } else {
-        if(strlen(cli_buffer) < (CLI_BUFFER_SIZE - 1)){
+        if(cli_index < (CLI_BUFFER_SIZE - 1)){
             cli_buffer[cli_index] = (char)byte;
             cli_index++;
             cli_buffer[cli_index] = '\0';
