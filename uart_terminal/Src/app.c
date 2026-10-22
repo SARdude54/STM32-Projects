@@ -4,6 +4,7 @@
 #include "bsp_button.h"
 #include "bsp_led.h"
 #include "uart.h"
+#include "cli.h"
 
 #define USART2_CLOCK_HZ 4000000u
 #define UART_BAUD_RATE  115200u
@@ -15,17 +16,17 @@ void app_init(void){
 
     uart2_init(USART2_CLOCK_HZ, UART_BAUD_RATE);
 
-    uart2_write_string("Hello from STM32!\r\n");
+    cli_init();
 }
 
 void app_update(void)
 {
-    uint8_t byte;
+    bsp_button_update();
 
-    if (uart2_read_byte(&byte) != 0u)
-    {
-        uart2_write_byte('[');
-        uart2_write_byte(byte);
-        uart2_write_byte(']');
+    if(bsp_button_pressed() != 0u){
+        bsp_led_toggle();
     }
+
+    cli_update();
+
 }

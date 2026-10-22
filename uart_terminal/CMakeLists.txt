@@ -38,6 +38,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   Src/app.c
   Src/bsp_button.c
   Src/uart.c
+  Src/cli.c
 )
 
 # Add include directories
@@ -51,6 +52,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   l476_baremetal/Inc/app.h
   l476_baremetal/Inc/bsp_button.h
   l476_baremetal/Inc/uart.h
+  l476_baremetal/Inc/cli.h
 
 )
 
